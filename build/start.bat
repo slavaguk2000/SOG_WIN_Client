@@ -1,0 +1,1 @@
+python src\view.py 192.168.3.212
