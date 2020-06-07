@@ -10,9 +10,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-mStart = [130,130+691-234]
-mSize = [691, 234]
-isFull = 1
 
 class Ui_mainWindow(object):
     def setupUi(self, mainWindow):
@@ -43,12 +40,13 @@ class Ui_mainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.roll.sizePolicy().hasHeightForWidth())
         self.roll.setSizePolicy(sizePolicy)
+        self.roll.setStyleSheet("background-color: rgba(0, 0, 0, 0)")
         self.roll.setText("")
-        self.roll.setPixmap(QtGui.QPixmap("res\\3.png"))
+        self.roll.setPixmap(QtGui.QPixmap("res/1.png"))
         self.roll.setScaledContents(True)
         self.roll.setObjectName("roll")
         self.mainText = QtWidgets.QLabel(self.centralwidget)
-        self.mainText.setGeometry(QtCore.QRect(150, mStart[isFull], 431, mSize[isFull]))
+        self.mainText.setGeometry(QtCore.QRect(90, 90, 571, 761))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(58)
@@ -58,17 +56,32 @@ class Ui_mainWindow(object):
         self.mainText.setAlignment(QtCore.Qt.AlignCenter)
         self.mainText.setWordWrap(True)
         self.mainText.setObjectName("mainText")
+        self.script = QtWidgets.QLabel(self.centralwidget)
+        self.script.setGeometry(QtCore.QRect(0, 0, 741, 984))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.script.sizePolicy().hasHeightForWidth())
+        self.script.setSizePolicy(sizePolicy)
+        self.script.setAutoFillBackground(False)
+        self.script.setText("")
+        self.script.setPixmap(QtGui.QPixmap("res/2.png"))
+        self.script.setScaledContents(True)
+        self.script.setObjectName("script")
         self.titleText = QtWidgets.QLabel(self.centralwidget)
-        self.titleText.setGeometry(QtCore.QRect(150, 820, 431, 41))
+        self.titleText.setGeometry(QtCore.QRect(80, 850, 611, 41))
         font = QtGui.QFont()
         font.setFamily("Arial")
-        font.setPointSize(15)
+        font.setPointSize(24)
         self.titleText.setFont(font)
         self.titleText.setStyleSheet("background-color: rgba(0, 0, 0, 0)")
-        self.titleText.setText("")
         self.titleText.setScaledContents(True)
         self.titleText.setAlignment(QtCore.Qt.AlignCenter)
         self.titleText.setObjectName("titleText")
+        self.script.raise_()
+        self.roll.raise_()
+        self.mainText.raise_()
+        self.titleText.raise_()
         mainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(mainWindow)
@@ -77,4 +90,5 @@ class Ui_mainWindow(object):
     def retranslateUi(self, mainWindow):
         _translate = QtCore.QCoreApplication.translate
         mainWindow.setWindowTitle(_translate("mainWindow", "SoG-client"))
-        self.mainText.setText(_translate("mainWindow", ""))
+        self.mainText.setText(_translate("mainWindow", "1. Так совершены небо и земля и все воинство их."))
+        self.titleText.setText(_translate("mainWindow", "Бытие 2"))

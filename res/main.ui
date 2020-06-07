@@ -60,11 +60,14 @@
       <verstretch>0</verstretch>
      </sizepolicy>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(0, 0, 0, 0)</string>
+    </property>
     <property name="text">
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>3.png</pixmap>
+     <pixmap>../src/res/1.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -73,10 +76,10 @@
    <widget class="QLabel" name="mainText">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>130</y>
-      <width>431</width>
-      <height>691</height>
+      <x>90</x>
+      <y>90</y>
+      <width>571</width>
+      <height>761</height>
      </rect>
     </property>
     <property name="font">
@@ -101,26 +104,54 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QLabel" name="script">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>741</width>
+      <height>984</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Ignored" vsizetype="Minimum">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../src/res/2.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
    <widget class="QLabel" name="titleText">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>820</y>
-      <width>431</width>
+      <x>80</x>
+      <y>850</y>
+      <width>611</width>
       <height>41</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <family>Arial</family>
-      <pointsize>15</pointsize>
+      <pointsize>32</pointsize>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgba(0, 0, 0, 0)</string>
     </property>
     <property name="text">
-     <string/>
+     <string>Бытие 2</string>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -129,6 +160,10 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
+   <zorder>script</zorder>
+   <zorder>roll</zorder>
+   <zorder>mainText</zorder>
+   <zorder>titleText</zorder>
   </widget>
  </widget>
  <resources/>

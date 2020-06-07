@@ -1,14 +1,25 @@
 import threading
 
-SPEED = 15
-MIN_HEIGHT = 200
-MAX_HEIGHT = 984
+SPEED = 5
+SHAKE_AMPLITUDE = 20
+MIN_HEIGHT = 0
+MAX_HEIGHT = 984 - SHAKE_AMPLITUDE
+MIN_WIDTH = 0
+MAX_WIDTH = 741
+TIMER_TIMEOUT = 20
+
+
 import math
 import sys  # sys нужен для передачи argv в QApplication
 from PyQt5 import QtWidgets, QtCore, QtGui, QtNetwork
 import design  # Это наш конвертированный файл дизайна
 from tcp import start_socket
 
+def d_ceil(num):
+    new_num = math.ceil(num)
+    if num < 0:
+        new_num -= 1
+    return new_num
 
 class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
     sig = QtCore.pyqtSignal()
@@ -21,11 +32,12 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
 
         self.counter = 0
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.roll_step)
-
-        self.sourcePicture = QtGui.QPixmap("res/3.png")
-        self.setPicture = QtGui.QPixmap(self.sourcePicture.size())
+        self.rollTimer = QtCore.QTimer()
+        self.rollTimer.timeout.connect(self.roll_step)
+        self.scriptTimer = QtCore.QTimer()
+        self.scriptTimer.timeout.connect(self.script_step)
+        if design.isFull:
+            self.mainText.setStyleSheet("color: white")
         self.sig.connect(self.roll_start)
         start_socket(self)
         self.down = False
@@ -42,40 +54,62 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
         self.sig.emit()
 
     def roll_step(self):
-        height = self.roll.height()
-        if (self.down and height < MAX_HEIGHT) or (not self.down and height > MIN_HEIGHT):
-            step = math.ceil((MAX_HEIGHT - height) * SPEED / 250)
+        width = self.roll.width()
+        if (self.down and width < MAX_WIDTH) or (not self.down and width > MIN_WIDTH):
+            step = math.ceil((MAX_WIDTH - width) * SPEED / 10)
+            width += (step if self.down else (-step - 1))
+        else:
+            self.rollTimer.stop()
+            if self.down:
+                self.target_height = MAX_HEIGHT + SHAKE_AMPLITUDE
+                self.scriptTimer.start(TIMER_TIMEOUT)
+            else:
+                self.inProcess = False
+        self.roll.setGeometry(QtCore.QRect(MAX_WIDTH-width, 0, width, MAX_HEIGHT))
+        self.roll.setFixedWidth(width)
+
+    def script_step(self):
+        height = self.script.height()
+        if (self.down and height != self.target_height) or (not self.down and height > MIN_HEIGHT):
+            step = d_ceil((self.target_height - height) * SPEED / 10)
             height += (step if self.down else (-step - 1))
         else:
-            self.timer.stop()
-            self.inProcess = False
-            if self.down:
-                self.set_text()
-                self.isOpen = True
+            amplitude = self.target_height - MAX_HEIGHT
+            if amplitude == 0:
+                self.scriptTimer.stop()
+                if self.down:
+                    self.set_text()
+                    self.inProcess = False
+                    self.isOpen = True
+                else:
+                    self.rollTimer.start(TIMER_TIMEOUT)
+                    self.isOpen = False
             else:
-                self.isOpen = False
-        self.roll.setFixedHeight(height)
-        self.set_opacity((height-MIN_HEIGHT)/(MAX_HEIGHT-MIN_HEIGHT))
-
-    def set_opacity(self, opacity):
-        self.setPicture.fill(QtCore.Qt.transparent)
-        self.painter = QtGui.QPainter(self.setPicture)
-        self.painter.setOpacity(opacity)
-        self.painter.drawPixmap(0, 0, self.sourcePicture)
-        self.painter.end()
-        self.roll.setPixmap(self.setPicture)
+                amplitude = int(amplitude / 2)
+                print("new amplitude ", amplitude)
+                self.target_height = MAX_HEIGHT - amplitude
+        self.script.setFixedHeight(height)
 
     def roll_start(self):
+        print("roll start")
         if not self.down:
             self.clear_roll()
-        if self.isOpen and self.down:
+        if (self.isOpen and self.down) or design.isFull:
             self.set_text()
         else:
             if self.inProcess:
                 return
             self.inProcess = True
-            self.roll.setFixedHeight(MIN_HEIGHT if self.down else MAX_HEIGHT)
-            self.timer.start(1)
+            self.roll.setFixedWidth(MIN_WIDTH if self.down else MAX_WIDTH)
+            self.script.setFixedHeight(MIN_HEIGHT if self.down else MAX_HEIGHT)
+            if self.down:
+                print("rollT start")
+                self.rollTimer.start(TIMER_TIMEOUT)
+            else:
+                print("scriptT start")
+                self.target_height = int(MAX_HEIGHT)
+                self.scriptTimer.start(TIMER_TIMEOUT)
+
 
     def clear_roll(self):
         self.title_string = ""
@@ -107,6 +141,7 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
         self.mainText.setText(text_string)
 
 def main():
+    design.isFull = int(sys.argv[-2]) if len(sys.argv) > 2 else 0
     app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
     window = ClientApp()  # Создаём объект класса ExampleApp
     window.show()  # Показываем окно
