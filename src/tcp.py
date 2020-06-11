@@ -26,7 +26,6 @@ def get_text(set_text):
         try:
             sock = socket.socket()
             sock.connect((address, 8536))
-
             frame = bytearray()
             frame.append(100)
             frame.append(0)
@@ -43,7 +42,6 @@ def get_text(set_text):
                 else:
                     print("Bad frame")
                     break
-
             sock.close()
         except:
             print("connection error")

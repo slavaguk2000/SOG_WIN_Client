@@ -2,13 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="adc04767-2306-4626-a01e-ce3c28ea4208" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/res/3.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/res/main.ui" beforeDir="false" afterPath="$PROJECT_DIR$/res/main.ui" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/design.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/design.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tcp.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tcp.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/view.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/SoG-Client/res/3.png" beforeDir="false" afterPath="$PROJECT_DIR$/test/SoG-Client/res/3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/SoG-Client/start_roll.bat" beforeDir="false" afterPath="$PROJECT_DIR$/test/SoG-Client/start_roll.bat" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -119,6 +116,8 @@
       <workItem from="1591555261520" duration="6714000" />
       <workItem from="1591562032142" duration="329000" />
       <workItem from="1591566858969" duration="3553000" />
+      <workItem from="1591781196970" duration="4879000" />
+      <workItem from="1591890475928" duration="6175000" />
     </task>
     <servers />
   </component>
@@ -140,6 +139,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/SOG_WIN_CLIENT$main.coverage" NAME="main Coverage Results" MODIFIED="1591438611078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
-    <SUITE FILE_PATH="coverage/SOG_WIN_CLIENT$view.coverage" NAME="view Coverage Results" MODIFIED="1591570779286" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/SOG_WIN_CLIENT$view.coverage" NAME="view Coverage Results" MODIFIED="1591897632058" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
   </component>
 </project>

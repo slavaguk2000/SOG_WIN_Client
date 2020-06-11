@@ -21,100 +21,117 @@ def d_ceil(num):
         new_num -= 1
     return new_num
 
+def create_timer(step_fun):
+    timer = QtCore.QTimer()
+    timer.timeout.connect(step_fun)
+    return timer
+
 class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
     sig = QtCore.pyqtSignal()
     inProcess = False
     isOpen = False
+    alpha = 0
     def __init__(self):
-        # Это здесь нужно для доступа к переменным, методам
-        # и т.д. в файле design.py
         super().__init__()
-        self.setupUi(self)  # Это нужно для инициализации нашего дизайна
+        self.setupUi(self)
 
         self.counter = 0
-        self.rollTimer = QtCore.QTimer()
-        self.rollTimer.timeout.connect(self.roll_step)
-        self.scriptTimer = QtCore.QTimer()
-        self.scriptTimer.timeout.connect(self.script_step)
+        self.rollTimer = create_timer(self.roll_step)
+        self.scriptTimer = create_timer(self.script_step)
+        self.textTimer = create_timer(self.text_step)
         if design.isFull:
             self.mainText.setStyleSheet("color: white")
         self.sig.connect(self.roll_start)
         start_socket(self)
-        self.down = False
-        self.roll_start()
-
+        self.roll.setFixedWidth(MIN_WIDTH)
+        self.script.setFixedHeight(MIN_HEIGHT)
 
     def setup_text(self, text, title):
-        if (text == ""):
-            self.down = False
-        else:
-            self.text_string = text
-            self.title_string = title
-            self.down = True
+        self.text_string = text
+        self.title_string = title
+        self.down = text != ""
         self.sig.emit()
 
-    def roll_step(self):
-        width = self.roll.width()
-        if (self.down and width < MAX_WIDTH) or (not self.down and width > MIN_WIDTH):
-            step = math.ceil((MAX_WIDTH - width) * SPEED / 10)
-            width += (step if self.down else (-step - 1))
+    def roll_end(self):
+        if self.down:
+            self.target_height = MAX_HEIGHT + SHAKE_AMPLITUDE
+            self.scriptTimer.start(TIMER_TIMEOUT)
         else:
-            self.rollTimer.stop()
-            if self.down:
-                self.target_height = MAX_HEIGHT + SHAKE_AMPLITUDE
-                self.scriptTimer.start(TIMER_TIMEOUT)
-            else:
-                self.inProcess = False
-        self.roll.setGeometry(QtCore.QRect(MAX_WIDTH-width, 0, width, MAX_HEIGHT))
-        self.roll.setFixedWidth(width)
+            self.inProcess = False
 
-    def script_step(self):
-        height = self.script.height()
-        if (self.down and height != self.target_height) or (not self.down and height > MIN_HEIGHT):
-            step = d_ceil((self.target_height - height) * SPEED / 10)
-            height += (step if self.down else (-step - 1))
+    def script_end(self):
+        if self.down:
+            self.set_text()
+            self.target_alpha = 255
+            self.textTimer.start(TIMER_TIMEOUT)
         else:
-            amplitude = self.target_height - MAX_HEIGHT
-            if amplitude == 0:
-                self.scriptTimer.stop()
-                if self.down:
-                    self.set_text()
-                    self.inProcess = False
-                    self.isOpen = True
-                else:
-                    self.rollTimer.start(TIMER_TIMEOUT)
-                    self.isOpen = False
-            else:
-                amplitude = int(amplitude / 2)
-                print("new amplitude ", amplitude)
-                self.target_height = MAX_HEIGHT - amplitude
+            self.target_width = MIN_WIDTH
+            self.rollTimer.start(TIMER_TIMEOUT)
+
+    def setScriptHeight(self, height):
         self.script.setFixedHeight(height)
 
+    def setRollWidth(self, width):
+        self.roll.setGeometry(QtCore.QRect(MAX_WIDTH - width, 0, width, MAX_HEIGHT))
+        self.roll.setFixedWidth(width)
+
+    def set_roll_target(self, amplitude):
+        self.target_width = MAX_WIDTH - amplitude
+
+    def set_script_target(self, amplitude):
+        self.target_height = MAX_HEIGHT - amplitude
+
+    def core_step(self, demesion_get, target, end_target, timer, end_fun, set_demension_fun, set_new_target):
+        demension = demesion_get()
+        if (demension != target):
+            step = d_ceil((target - demension) * SPEED / 10)
+            demension += step
+        else:
+            if self.down:
+                amplitude = target - end_target
+                if not amplitude:
+                    timer.stop()
+                    end_fun()
+                else:
+                    amplitude = int(amplitude / 2)
+                    set_new_target(amplitude)
+            else:
+                timer.stop()
+                end_fun()
+        set_demension_fun(demension)
+
+    def roll_step(self):
+        self.core_step(self.roll.width, self.target_width, MAX_WIDTH, self.rollTimer, self.roll_end, self.setRollWidth, self.set_roll_target)
+
+    def script_step(self):
+        self.core_step(self.script.height, self.target_height, MAX_HEIGHT, self.scriptTimer, self.script_end, self.setScriptHeight, self.set_script_target)
+
+    def text_step(self):
+        if (self.alpha != self.target_alpha):
+            self.alpha += d_ceil((self.target_alpha - self.alpha) * SPEED / 25)
+            styleSheet = "background-color: rgba(0, 0, 0, 0); color: rgba(0, 0, 0, " + str(self.alpha / 255) + ")"
+            for textLabel in [self.mainText, self.titleText]:
+                textLabel.setStyleSheet(styleSheet)
+        else:
+            self.textTimer.stop()
+            if self.down:
+                self.isOpen = True
+            else:
+                self.isOpen = False
+                self.target_height = MIN_HEIGHT
+                self.scriptTimer.start(TIMER_TIMEOUT)
+
     def roll_start(self):
-        print("roll start")
-        if not self.down:
-            self.clear_roll()
         if (self.isOpen and self.down) or design.isFull:
             self.set_text()
         else:
-            if self.inProcess:
-                return
-            self.inProcess = True
-            self.roll.setFixedWidth(MIN_WIDTH if self.down else MAX_WIDTH)
-            self.script.setFixedHeight(MIN_HEIGHT if self.down else MAX_HEIGHT)
             if self.down:
-                print("rollT start")
+                self.target_width = MAX_WIDTH + SHAKE_AMPLITUDE / 2
                 self.rollTimer.start(TIMER_TIMEOUT)
             else:
-                print("scriptT start")
-                self.target_height = int(MAX_HEIGHT)
-                self.scriptTimer.start(TIMER_TIMEOUT)
+                self.target_alpha = 0
+                self.textTimer.start(TIMER_TIMEOUT)
 
-
-    def clear_roll(self):
-        self.title_string = ""
-        self.text_string = ""
-        self.set_text()
 
     def set_text(self):
         self.set_title(self.title_string)

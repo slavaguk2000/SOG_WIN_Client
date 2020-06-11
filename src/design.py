@@ -51,7 +51,7 @@ class Ui_mainWindow(object):
         font.setFamily("Arial")
         font.setPointSize(58)
         self.mainText.setFont(font)
-        self.mainText.setStyleSheet("background-color: rgba(0, 0, 0, 0)")
+        self.mainText.setStyleSheet("background-color: rgba(0, 0, 0, 0); color: rgba(0, 0, 0, 0)")
         self.mainText.setScaledContents(True)
         self.mainText.setAlignment(QtCore.Qt.AlignCenter)
         self.mainText.setWordWrap(True)
@@ -74,7 +74,7 @@ class Ui_mainWindow(object):
         font.setFamily("Arial")
         font.setPointSize(24)
         self.titleText.setFont(font)
-        self.titleText.setStyleSheet("background-color: rgba(0, 0, 0, 0)")
+        self.titleText.setStyleSheet("background-color: rgba(0, 0, 0, 0); color: rgba(0, 0, 0, 0)")
         self.titleText.setScaledContents(True)
         self.titleText.setAlignment(QtCore.Qt.AlignCenter)
         self.titleText.setObjectName("titleText")
@@ -90,5 +90,5 @@ class Ui_mainWindow(object):
     def retranslateUi(self, mainWindow):
         _translate = QtCore.QCoreApplication.translate
         mainWindow.setWindowTitle(_translate("mainWindow", "SoG-client"))
-        self.mainText.setText(_translate("mainWindow", "1. Так совершены небо и земля и все воинство их."))
-        self.titleText.setText(_translate("mainWindow", "Бытие 2"))
+        self.mainText.setText(_translate("mainWindow", "mainWindow"))
+        self.titleText.setText(_translate("mainWindow", "mainWindow"))
