@@ -1,4 +1,5 @@
-SPEED = 5
+SPEED = 6
+SPEED_TEXT = 1.7
 SHAKE_AMPLITUDE = 20
 MIN_HEIGHT = 0
 MAX_HEIGHT = 984 - SHAKE_AMPLITUDE
@@ -43,6 +44,7 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
         start_socket(self)
         self.roll.setFixedWidth(MIN_WIDTH)
         self.script.setFixedHeight(MIN_HEIGHT)
+		
 
     def setup_text(self, text, title):
         self.text_string = text
@@ -106,7 +108,7 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
 
     def text_step(self):
         if (self.alpha != self.target_alpha):
-            self.alpha += d_ceil((self.target_alpha - self.alpha) * SPEED / 25)
+            self.alpha += d_ceil((self.target_alpha - self.alpha) * SPEED * SPEED_TEXT / 25)
             styleSheet = "background-color: rgba(0, 0, 0, 0); color: rgba(0, 0, 0, " + str(self.alpha / 255) + ")"
             for textLabel in [self.mainText, self.titleText]:
                 textLabel.setStyleSheet(styleSheet)
@@ -141,13 +143,14 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
     def set_main_text(self, text_string):
         if len(text_string):
             font = self.mainText.font()
-            rect = self.mainText.contentsRect()
+            rect = self.mainText.geometry()
             fontSize = 1
             while True:
                 f = QtGui.QFont(font)
                 f.setPixelSize(fontSize)
                 r = QtGui.QFontMetrics(f).boundingRect(rect, QtCore.Qt.AlignCenter | QtCore.Qt.TextWordWrap, text_string)
                 if(r.height() <= rect.height() and r.width() <= rect.width()):
+                #if((r.height() <= int(761 - (int(design.y1 - ((design.x1 - design.x0) * 9 /16))))) and (r.width() <= rect.width())):
                     fontSize += 1
                 else:
                     break
