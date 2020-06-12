@@ -1,5 +1,3 @@
-import threading
-
 SPEED = 5
 SHAKE_AMPLITUDE = 20
 MIN_HEIGHT = 0
