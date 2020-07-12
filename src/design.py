@@ -1,36 +1,31 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-
-isFull = False
-x0 = 90
-xSize = 571
-startYSize = 761
-yEnd = 90 + startYSize
+import config
 
 class Ui_mainWindow(object):
-    def setupUi(self, mainWindow):
-        ySize = int(xSize * 9 / 16) if isFull else startYSize
+    def setupUi(self, mainWindow):  
         mainWindow.setObjectName("mainWindow")
-        mainWindow.resize(742, 984)
+        mainWindow.resize(config.WIDTH, config.HEIGHT)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(mainWindow.sizePolicy().hasHeightForWidth())
         mainWindow.setSizePolicy(sizePolicy)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("res\\icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("res/folder.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("res/folder.ico"), QtGui.QIcon.Normal, QtGui.QIcon.On)
         mainWindow.setWindowIcon(icon)
-        mainWindow.setStyleSheet("background-color: " + ("black" if isFull else "blue"))
+        mainWindow.setStyleSheet("background-color: " + ("black" if config.isFull else "blue"))
         self.centralwidget = QtWidgets.QWidget(mainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.centralwidget.sizePolicy().hasHeightForWidth())
         self.centralwidget.setSizePolicy(sizePolicy)
-        self.centralwidget.setMinimumSize(QtCore.QSize(742, 984))
-        self.centralwidget.setMaximumSize(QtCore.QSize(742, 984))
+        self.centralwidget.setMinimumSize(QtCore.QSize(config.WIDTH, config.HEIGHT))
+        self.centralwidget.setMaximumSize(QtCore.QSize(config.WIDTH, config.HEIGHT))
         self.centralwidget.setObjectName("centralwidget")
         self.roll = QtWidgets.QLabel(self.centralwidget)
-        self.roll.setGeometry(QtCore.QRect(0, 0, 741, 984))
+        self.roll.setGeometry(QtCore.QRect(0, config.yStart, config.MAX_WIDTH, config.MAX_HEIGHT))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -38,22 +33,22 @@ class Ui_mainWindow(object):
         self.roll.setSizePolicy(sizePolicy)
         self.roll.setStyleSheet("background-color: rgba(0, 0, 0, 0)")
         self.roll.setText("")
-        self.roll.setPixmap(QtGui.QPixmap("res/1.png"))
+        if not config.isFull: self.roll.setPixmap(QtGui.QPixmap("res/1.png"))
         self.roll.setScaledContents(True)
         self.roll.setObjectName("roll")
         self.mainText = QtWidgets.QLabel(self.centralwidget)
-        self.mainText.setGeometry(QtCore.QRect(x0, yEnd - ySize, xSize, ySize))
+        self.mainText.setGeometry(QtCore.QRect(config.x0, config.yStart + config.y0, config.xSize, config.ySize - config.titleYSize))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(58)
         self.mainText.setFont(font)
-        self.mainText.setStyleSheet("background-color: rgba(0, 0, 0, 0); color: rgba(0, 0, 0, 0)")
+        self.mainText.setStyleSheet("background-color: rgba(0, 0, 0, 0); color: rgba(0, 0, 0, 255)")
         self.mainText.setScaledContents(True)
         self.mainText.setAlignment(QtCore.Qt.AlignCenter)
         self.mainText.setWordWrap(True)
         self.mainText.setObjectName("mainText")
         self.script = QtWidgets.QLabel(self.centralwidget)
-        self.script.setGeometry(QtCore.QRect(0, 0, 741, 984))
+        self.script.setGeometry(QtCore.QRect(0, config.yStart, config.MAX_WIDTH, config.MAX_HEIGHT))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -61,16 +56,16 @@ class Ui_mainWindow(object):
         self.script.setSizePolicy(sizePolicy)
         self.script.setAutoFillBackground(False)
         self.script.setText("")
-        self.script.setPixmap(QtGui.QPixmap("res/2.png"))
+        if not config.isFull: self.script.setPixmap(QtGui.QPixmap("res/2.png"))
         self.script.setScaledContents(True)
         self.script.setObjectName("script")
         self.titleText = QtWidgets.QLabel(self.centralwidget)
-        self.titleText.setGeometry(QtCore.QRect(80, 850, 611, 41))
+        self.titleText.setGeometry(QtCore.QRect(config.x0, config.yStart + config.y0+config.ySize-config.titleYSize, config.xSize, config.titleYSize))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(24)
         self.titleText.setFont(font)
-        self.titleText.setStyleSheet("background-color: rgba(0, 0, 0, 0); color: rgba(0, 0, 0, 0)")
+        self.titleText.setStyleSheet("background-color: rgba(0, 0, 0, 0); color: rgba(0, 0, 0, 255)")
         self.titleText.setScaledContents(True)
         self.titleText.setAlignment(QtCore.Qt.AlignCenter)
         self.titleText.setObjectName("titleText")
@@ -86,6 +81,6 @@ class Ui_mainWindow(object):
 
     def retranslateUi(self, mainWindow):
         _translate = QtCore.QCoreApplication.translate
-        mainWindow.setWindowTitle(_translate("mainWindow", "SoG-client"))
+        mainWindow.setWindowTitle(_translate("mainWindow", "SoG-client-" + ("full" if config.isFull else "roll") + "-horizontal"))
         self.mainText.setText(_translate("mainWindow", ""))
         self.titleText.setText(_translate("mainWindow", ""))
