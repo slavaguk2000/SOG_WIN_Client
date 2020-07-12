@@ -2,6 +2,8 @@ import socket
 import sys
 import threading
 
+sock = 0
+work = True
 
 def get_int32_from_bytes(data):
     res = int.from_bytes(data[0:4], 'big')
@@ -14,7 +16,9 @@ def get_string(data):
     data = data[len:]
     return data, str
 
-
+def close_sock():
+    sock.close()
+    
 def get_text(set_text):
     if len(sys.argv) < 2:
         print("Enter SOG-server ip-address as command line argument")
@@ -22,8 +26,9 @@ def get_text(set_text):
     address = sys.argv[-1]
     print(address)
 
-    while True:
+    while work:
         try:
+            global sock
             sock = socket.socket()
             sock.connect((address, 8536))
             frame = bytearray()
@@ -31,22 +36,30 @@ def get_text(set_text):
             frame.append(0)
             sock.send(frame)
 
-            while True:
+            while work:
                 data = sock.recv(16*1024)
                 data, flag = get_int32_from_bytes(data)
                 if (flag == 1):
-                    get_string(data)
                     data, text = get_string(data)
                     data, title = get_string(data)
                     set_text(text, title)
                 else:
                     print("Bad frame")
                     break
-            sock.close()
-        except:
+            close_sock()
+        except:        
             print("connection error")
+            try:
+                close_sock()
+            except:
+                i = 0
 
-
+thread = 0
 def start_socket(par):
     thread = threading.Thread(target=get_text, args=(par.setup_text,))
     thread.start()
+    
+def stop_socket():
+    global work
+    work = False
+    close_sock()
