@@ -1,1 +1,1 @@
-python src\view.py 192.168.100.47
+python src/view.py 0 192.168.1.161

@@ -22,6 +22,7 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
     inProcess = False
     isOpen = False
     alpha = 0
+    string_index = 0
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -37,12 +38,21 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
         self.script.setFixedWidth(config.MIN_WIDTH)
         self.roll.setFixedHeight(config.MIN_HEIGHT)
         self.destroyed.connect(stop_socket)		
+		
+		
+    def keyPressEvent(self, e):
+        if e.text() == ".":
+            self.string_index += 1
+            if self.string_index >= len(self.text_strings):
+                self.string_index = 0
+            self.set_text()
 
     def setup_text(self, text, title):
-        self.text_string = text
+        self.string_index = 0
+        self.text_strings = text.split(".")
         self.title_string = title
         self.down = text != ""
-        self.sig.emit()
+        self.set_text()
 
     def roll_end(self):
         if self.down:
@@ -114,7 +124,7 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
                 self.scriptTimer.start(config.TIMER_TIMEOUT)
 
     def roll_start(self):
-        if (self.isOpen and self.down) or config.isFull:
+        if (self.isOpen and self.down) or config.isFull or True:
             self.set_text()
         else:
             if self.down:
@@ -127,7 +137,7 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
 
     def set_text(self):
         self.set_title(self.title_string)
-        self.set_main_text(self.text_string)
+        self.set_main_text(self.text_strings[self.string_index])
 
     def set_title(self, title_string):
         self.titleText.setText(title_string)
@@ -152,6 +162,7 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
             f.setPixelSize(fontSize-1)
             self.mainText.setFont(f)
         self.mainText.setText(text_string)
+
 
 def main():
     config.isFull = int(sys.argv[-2]) if len(sys.argv) > 2 else 0
