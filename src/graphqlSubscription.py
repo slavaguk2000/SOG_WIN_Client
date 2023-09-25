@@ -2,6 +2,27 @@ from PyQt5.QtCore import QThread, pyqtSignal
 from gql import Client, gql
 from gql.transport.websockets import WebsocketsTransport
 
+bible_books_query = gql("""
+   query bibleBooks($bibleId: ID!) {
+       bibleBooks(bibleId: $bibleId) {
+         id
+         name
+         chapterCount
+       }
+   }
+   """)
+
+subscription_query = gql("""
+subscription {
+    activeSlideSubscription {
+         id
+        content
+        location
+        searchContent
+    }
+}
+""")
+
 
 class GraphQLSubscription:
     def __init__(self, url, main_window, parent):
@@ -13,25 +34,30 @@ class GraphQLSubscription:
     async def start_subscription(self):
         try:
             async with Client(
-                transport=self.transport,
-                fetch_schema_from_transport=True,
+                    transport=self.transport,
+                    fetch_schema_from_transport=True,
             ) as session:
-                # Определите запрос на подписку
-                query = gql("""
-                subscription {
-                    activeSlideSubscription {
-                         id
-                        content
-                        location
-                        searchContent
-                    }
-                }
-                """)
+                try:
+                    bible_books_data = (await session.execute(bible_books_query,
+                                                              variable_values={"bibleId": "0"}))['bibleBooks']
+                except BaseException as e:
+                    print(e)
+                    bible_books_data = None
 
-                async for result in session.subscribe(query):
+                print(bible_books_data)
+
+                async for result in session.subscribe(subscription_query):
                     slide = result.get("activeSlideSubscription")
                     if slide:
-                        self.parent.update_signal.emit({'text': slide['content'], 'title': 'title'})
+                        try:
+                            location = slide["location"]
+                            self.parent.update_signal.emit({
+                                'text': f"{location[-1]}. {slide['content']}",
+                                'title': f'{bible_books_data[int(location[-3])]["name"] if bible_books_data else ""} {location[-2]}'
+                            })
+                        except BaseException as e:
+                            print(e)
+
                     else:
                         self.parent.update_signal.emit({'text': '', 'title': ''})
         except BaseException as e:

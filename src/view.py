@@ -38,7 +38,7 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
         if config.isFull:
            self.mainText.setStyleSheet("color: white")
         self.sig.connect(self.roll_start)
-        start_socket(self)
+        # start_socket(self)
         self.script.setFixedWidth(config.MIN_WIDTH)
         self.roll.setFixedHeight(config.MIN_HEIGHT)
         self.destroyed.connect(stop_socket)
