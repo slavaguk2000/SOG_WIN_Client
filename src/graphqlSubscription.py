@@ -1,13 +1,14 @@
-from PyQt5.QtCore import QThread
+from PyQt5.QtCore import QThread, pyqtSignal
 from gql import Client, gql
 from gql.transport.websockets import WebsocketsTransport
 
 
 class GraphQLSubscription:
-    def __init__(self, url, main_window):
+    def __init__(self, url, main_window, parent):
         self.url = f'ws://{url}:8000'
         self.transport = WebsocketsTransport(url=self.url)
         self.main_window = main_window
+        self.parent = parent
 
     async def start_subscription(self):
         try:
@@ -30,9 +31,9 @@ class GraphQLSubscription:
                 async for result in session.subscribe(query):
                     slide = result.get("activeSlideSubscription")
                     if slide:
-                        self.main_window.setup_text(slide['content'], 'title')
+                        self.parent.update_signal.emit({'text': slide['content'], 'title': 'title'})
                     else:
-                        self.main_window.setup_text('', '')
+                        self.parent.update_signal.emit({'text': '', 'title': ''})
         except BaseException as e:
             print(e)
 
@@ -41,15 +42,16 @@ class GraphQLSubscription:
 
 
 class SubscriptionThread(QThread):
+    update_signal = pyqtSignal(dict)
+
     def __init__(self, url, main_window):
         super().__init__()
         self.work = True
-        self.subscriber = GraphQLSubscription(url, main_window)
+        self.subscriber = GraphQLSubscription(url, main_window, self)
 
     def run(self):
         import asyncio
-        while self.work:
-            asyncio.run(self.subscriber.start_subscription())
+        asyncio.run(self.subscriber.start_subscription())
 
     def stop(self):
         self.work = False

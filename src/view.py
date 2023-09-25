@@ -26,6 +26,7 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
     inProcess = False
     isOpen = False
     alpha = 0
+
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -41,8 +42,12 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
         self.script.setFixedWidth(config.MIN_WIDTH)
         self.roll.setFixedHeight(config.MIN_HEIGHT)
         self.destroyed.connect(stop_socket)
-        self.subscription_thread = SubscriptionThread(self, sys.argv[-1])
+        self.subscription_thread = SubscriptionThread(sys.argv[-1], self)
         self.subscription_thread.start()
+        self.subscription_thread.update_signal.connect(self.update_ui)
+
+    def update_ui(self, slide):
+        self.setup_text(slide['text'], slide['title'])
 
     def setup_text(self, text, title):
         self.text_string = text
@@ -81,7 +86,7 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
 
     def core_step(self, demesion_get, target, end_target, timer, end_fun, set_demension_fun, set_new_target):
         demension = demesion_get()
-        if (demension != target):
+        if demension != target:
             step = d_ceil((target - demension) * config.SPEED / 10)
             demension += step
         else:

@@ -1,1 +1,1 @@
-python3 -m pip install PyQt5, gql, aiohttp
+python3 -m pip install PyQt5 gql aiohttp websockets
