@@ -2,9 +2,11 @@ import math
 import sys  # sys нужен для передачи argv в QApplication
 from PyQt5 import QtWidgets, QtCore, QtGui, QtNetwork
 import design  # Это наш конвертированный файл дизайна
+from src.graphqlSubscription import SubscriptionThread
 from tcp import start_socket, stop_socket
 
 import config
+
 
 def d_ceil(num):
     new_num = math.ceil(num)
@@ -12,16 +14,19 @@ def d_ceil(num):
         new_num -= 1
     return new_num
 
+
 def create_timer(step_fun):
     timer = QtCore.QTimer()
     timer.timeout.connect(step_fun)
     return timer
+
 
 class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
     sig = QtCore.pyqtSignal()
     inProcess = False
     isOpen = False
     alpha = 0
+
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -33,10 +38,16 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
         if config.isFull:
            self.mainText.setStyleSheet("color: white")
         self.sig.connect(self.roll_start)
-        start_socket(self)
+        # start_socket(self)
         self.script.setFixedWidth(config.MIN_WIDTH)
         self.roll.setFixedHeight(config.MIN_HEIGHT)
-        self.destroyed.connect(stop_socket)		
+        self.destroyed.connect(stop_socket)
+        self.subscription_thread = SubscriptionThread(sys.argv[-1], self)
+        self.subscription_thread.start()
+        self.subscription_thread.update_signal.connect(self.update_ui)
+
+    def update_ui(self, slide):
+        self.setup_text(slide['text'], slide['title'])
 
     def setup_text(self, text, title):
         self.text_string = text
@@ -75,7 +86,7 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
 
     def core_step(self, demesion_get, target, end_target, timer, end_fun, set_demension_fun, set_new_target):
         demension = demesion_get()
-        if (demension != target):
+        if demension != target:
             step = d_ceil((target - demension) * config.SPEED / 10)
             demension += step
         else:
@@ -152,6 +163,11 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
             f.setPixelSize(fontSize-1)
             self.mainText.setFont(f)
         self.mainText.setText(text_string)
+
+    def closeEvent(self, event):
+        self.subscription_thread.stop()
+        event.accept()
+
 
 def main():
     config.isFull = int(sys.argv[-2]) if len(sys.argv) > 2 else 0
