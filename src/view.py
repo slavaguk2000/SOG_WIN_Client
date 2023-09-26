@@ -2,7 +2,7 @@ import math
 import sys  # sys нужен для передачи argv в QApplication
 from PyQt5 import QtWidgets, QtCore, QtGui, QtNetwork
 import design  # Это наш конвертированный файл дизайна
-from src.graphqlSubscription import SubscriptionThread
+from graphqlSubscription import SubscriptionThread
 from tcp import start_socket, stop_socket
 
 import config

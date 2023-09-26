@@ -1,0 +1,1 @@
+start venv\Scripts\python.exe src\view.py 0 192.168.1.3
