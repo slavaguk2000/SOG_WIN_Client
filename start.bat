@@ -1,1 +1,1 @@
-python src\view.py 192.168.100.47
+venv\Scripts\python3 src\view.py 192.168.100.47
