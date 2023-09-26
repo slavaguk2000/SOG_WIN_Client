@@ -75,7 +75,7 @@ class ClientApp(QtWidgets.QMainWindow, design.Ui_mainWindow):
         self.script.setFixedWidth(width)
 
     def setRollHeight(self, height):
-        self.roll.setGeometry(QtCore.QRect(0, config.yStart + (config.MAX_HEIGHT - height) / 2, config.MAX_WIDTH, height)) #from right
+        self.roll.setGeometry(QtCore.QRect(0, int(config.yStart + (config.MAX_HEIGHT - height) / 2), config.MAX_WIDTH, height)) #from right
         self.roll.setFixedHeight(height)
 
     def set_roll_target(self, amplitude):
